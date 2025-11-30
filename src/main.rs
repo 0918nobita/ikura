@@ -1,4 +1,5 @@
 use clap::Parser;
+use indicatif::ProgressBar;
 use std::{collections::HashMap, path::PathBuf};
 
 #[derive(Parser)]
@@ -28,11 +29,17 @@ fn main() -> anyhow::Result<()> {
     revwalk.push(commit_id)?;
     revwalk.set_sorting(git2::Sort::TIME | git2::Sort::REVERSE)?;
 
+    let commits: Vec<_> = revwalk.collect();
+    let total_commits = commits.len();
+    let progress_bar = ProgressBar::new(total_commits as u64);
+
     let mut stats: HashMap<PathBuf, LineDelta> = HashMap::new();
 
-    for commit_id in revwalk {
+    for commit_id in commits {
         let commit_id = commit_id?;
         let commit = repo.find_commit(commit_id)?;
+
+        progress_bar.inc(1);
 
         if commit.parent_count() != 1 {
             continue;
@@ -69,6 +76,8 @@ fn main() -> anyhow::Result<()> {
             }),
         )?;
     }
+
+    progress_bar.finish();
 
     let mut sorted_stats: Vec<_> = stats.into_iter().collect();
 
