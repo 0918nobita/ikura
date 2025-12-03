@@ -1,4 +1,5 @@
 use clap::Parser;
+use git2::{BranchType, DiffOptions, Repository, Sort};
 use indicatif::ProgressBar;
 use std::{collections::HashMap, path::PathBuf};
 
@@ -19,15 +20,15 @@ struct LineDelta {
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
 
-    let repo = git2::Repository::open(args.repo_path)?;
+    let repo = Repository::open(args.repo_path)?;
 
-    let branch = repo.find_branch(&args.branch, git2::BranchType::Local)?;
+    let branch = repo.find_branch(&args.branch, BranchType::Local)?;
     let commit = branch.get().peel_to_commit()?;
     let commit_id = commit.id();
 
     let mut revwalk = repo.revwalk()?;
     revwalk.push(commit_id)?;
-    revwalk.set_sorting(git2::Sort::TIME | git2::Sort::REVERSE)?;
+    revwalk.set_sorting(Sort::TIME | Sort::REVERSE)?;
 
     let commits: Vec<_> = revwalk.collect();
     let total_commits = commits.len();
@@ -47,7 +48,14 @@ fn main() -> anyhow::Result<()> {
 
         let parent = commit.parent(0)?;
 
-        let diff = repo.diff_tree_to_tree(Some(&parent.tree()?), Some(&commit.tree()?), None)?;
+        let mut diff_options = DiffOptions::new();
+        diff_options.context_lines(0);
+
+        let diff = repo.diff_tree_to_tree(
+            Some(&parent.tree()?),
+            Some(&commit.tree()?),
+            Some(&mut diff_options),
+        )?;
 
         diff.foreach(
             &mut |_delta, _progress| true,
