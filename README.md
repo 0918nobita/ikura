@@ -3,12 +3,13 @@
 git リポジトリ内のファイルを、累計変更量の降順にソートして出力します。
 
 ```text
-Usage: ikura.exe [OPTIONS] <REPO_PATH>
+Usage: ikura.exe [OPTIONS] [REPOSITORY_PATH]
 
 Arguments:
-  <REPO_PATH>
+  [REPOSITORY_PATH]
 
 Options:
-      --branch <BRANCH>  [default: main]
-  -h, --help             Print help
+      --branch <BRANCH>
+      --pathspec <PATHSPEC>
+  -h, --help                 Print help
 ```
