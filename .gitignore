@@ -1,3 +1,6 @@
-.claude/setting.local.json
 /target
+.claude/setting.local.json
 CLAUDE.local.md
+
+# このCLIツールが読み込む設定ファイル
+ikura.toml
