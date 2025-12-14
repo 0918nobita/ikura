@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git fetch:*)",
+      "Bash(if [ -d \"specs\" ])",
+      "Bash(then ls -d specs/*-refactoring-agent)",
+      "Bash(else echo \"No specs directory\")",
+      "Bash(fi)",
+      "Bash(pwsh:*)"
+    ]
+  }
+}
